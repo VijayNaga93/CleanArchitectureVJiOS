@@ -1,0 +1,77 @@
+
+Concern                 -               Where It Lives
+
+API/DB/Caching                          Data Layer
+Business Logic                          Domain Layer (UseCases)
+UI / Input State                           Presentation Layer
+Shared Logic (e.g. Validation)             Core Layer
+Errors / Tokens / Config                   Cross-cutting Concerns
+
+✅ 1. API Call & Data Mapping
+    •    URLSession, Retrofit, Alamofire (etc.) inside a RemoteDataSource or APIService
+    •    DTO ↔ Domain Model mapping
+    •    ✅ You’ve already implemented this correctly.
+
+⸻
+
+✅ 2. Persistence (Database, Caching)
+    •    CoreData, Realm, SQLite, UserDefaults, FileSystem
+    •    Should follow the same repository pattern
+    •    Example:
+    •    UserDefaultsDataSource
+    •    UserSettingsRepositoryImpl
+    •    Decouples UseCase from how data is stored
+
+⸻
+
+✅ 3. Business Logic
+    •    Encapsulated inside UseCases or Interactors
+    •    Orchestrates high-level workflows, validations, rules
+    •    Example: LoginUseCase, CheckoutUseCase, UpdateProfileUseCase
+    •    ✅ You’re already doing this too
+
+⸻
+
+✅ 4. Validation Logic
+    •    Often lives in UseCase or Core/Utilities
+    •    Example: ValidationHelper.isValidEmail(_:)
+    •    Keeps UI lightweight
+
+⸻
+
+✅ 5. Dependency Injection
+    •    Allows switching between:
+    •    RealAPIService vs DummyAPIService
+    •    LocalDatabase vs CloudKit
+    •    Can be done manually or using DI frameworks like Swinject
+
+⸻
+
+✅ 6. UI Presentation & View Models
+    •    ViewModel only depends on UseCases, not API/DB
+    •    Decouples SwiftUI/JetpackCompose/React from business logic
+
+⸻
+
+✅ 7. Authentication & Token Management
+    •    Token stored in Keychain/UserDefaults (via Repository)
+    •    Passed automatically via NetworkClient (like we just discussed)
+    •    ✅ Should be injected, not hardcoded
+
+⸻
+
+✅ 8. Error Handling Strategy
+    •    Domain-friendly AppError, NetworkError, ValidationError
+    •    Mapped at boundaries (e.g. APIService → UseCase → ViewModel → View)
+
+⸻
+
+✅ 9. Background Tasks / Timers / Notifications
+    •    Schedule background work from UseCases
+    •    Notification logic (e.g. Push or Local) goes in Data layer or Application layer
+
+⸻
+
+✅ 10. Analytics / Logging
+    •    Domain-agnostic events (e.g., TrackUserLoggedInEvent)
+    •    Logged via AnalyticsService injected into UseCases or ViewModels
